@@ -1,0 +1,1 @@
+"""LaborLens backend application."""

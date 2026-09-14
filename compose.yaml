@@ -1,0 +1,64 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: labor_lens
+      MYSQL_USER: labor_lens
+      MYSQL_PASSWORD: labor_lens
+      MYSQL_ROOT_PASSWORD: labor_lens_root
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  chroma:
+    image: chromadb/chroma:0.5.23
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "</dev/tcp/localhost/8000"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - chroma_data:/chroma/chroma
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://labor_lens:labor_lens@mysql:3306/labor_lens}
+      CHROMA_URL: ${CHROMA_URL:-http://chroma:8000}
+      MODEL_BASE_URL: ${MODEL_BASE_URL:-https://api.openai.com/v1}
+      MODEL_NAME: ${MODEL_NAME:-}
+      MODEL_API_KEY: ${MODEL_API_KEY:-}
+      UPLOAD_TTL_MINUTES: ${UPLOAD_TTL_MINUTES:-30}
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      chroma:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:5173').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  mysql_data:
+  chroma_data:
