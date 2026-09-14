@@ -28,6 +28,27 @@
 - 第一版不提供律师服务、不生成正式法律文书、不解析聊天记录/录音/银行流水、不实现账户支付后台，也不自动联系外部主体。
 - 每次开发、修改、修复、优化、调整配置、修改测试或文档后，必须在完成必要验证之后向项目根目录的 `WORKLOG.md` 追加一条独立工作记录；未更新工作日志时，该任务不得视为完成。
 
+## Local Python Environment
+
+- 本地开发统一使用 Anaconda 环境 `labor_lens`，Python 版本固定为 3.12；不得在 Anaconda `base` 环境中安装项目依赖。
+- 首次创建和安装：
+
+```powershell
+conda create -n labor_lens python=3.12 pip -y
+conda activate labor_lens
+python -m pip install -e backend
+```
+
+- 本地运行后端测试：
+
+```powershell
+conda activate labor_lens
+Set-Location backend
+python -m pytest -q
+```
+
+- Docker 容器仍是迁移、服务集成和最终验收的标准环境；本地环境用于快速开发与单元测试。
+
 ## Mandatory Work Log
 
 以下规则适用于本计划中的每个任务和所有临时追加任务，无论改动规模大小：
