@@ -15,3 +15,11 @@
 - **涉及文件**：`.env.example`、`Makefile`、`compose.yaml`、`backend/Dockerfile`、`backend/pyproject.toml`、`backend/app/__init__.py`、`backend/app/config.py`、`backend/app/main.py`、`backend/tests/test_health.py`、`frontend/Dockerfile`、`frontend/package.json`、`frontend/index.html`、`frontend/src/main.jsx`、`WORKLOG.md`。
 - **验证结果**：`docker compose config` 校验通过并识别四个固定服务；本机 Python 健康检查测试为 `1 passed`，语法检查与 `git diff --check` 通过；`docker compose up -d --build` 成功构建并启动服务，`docker compose ps` 显示四个常驻容器均为 `healthy`；容器内健康检查测试为 `1 passed, 2 warnings`，警告均为测试依赖的弃用提示。
 - **备注**：Task 1 已完成并提交至 Git 远程仓库；当前前端为最小启动页，完整业务页面计划在 Task 8 实现。
+
+### 2026-09-15 16:15
+
+- **用户要求**：根据实施计划完成 Task 2“定义领域契约和 MySQL 持久化”。
+- **工作内容**：定义案件事实、追问轮次、紧急提醒、法律引用、风险判断、最终报告和案件记录的领域模型及约束；建立 `cases`、`case_facts`、`question_rounds`、`risk_findings`、`citations`、`reports`、`evaluation_runs` 七张表的 SQLAlchemy 映射和 Alembic 初始迁移；实现案件创建和分析结果保存仓储，并补充领域与仓储测试。
+- **涉及文件**：`backend/app/domain/models.py`、`backend/app/db/models.py`、`backend/app/db/repositories.py`、`backend/migrations/`、`backend/alembic.ini`、`backend/pyproject.toml`、`backend/Dockerfile`、`backend/tests/domain/test_models.py`、`backend/tests/db/test_case_repository.py`。
+- **验证结果**：Task 2 完成时，后端 Docker 镜像构建成功；真实 MySQL 的 Alembic 迁移升级到 `001_initial (head)`，结构一致性检查无新增升级操作；容器内 Task 2 测试为 `11 passed`、后端全量测试为 `12 passed, 2 warnings`。本次追加日志前，在 `labor_lens` 环境重跑 Task 2 测试为 `11 passed`，`git diff --check` 通过。
+- **备注**：Task 2 代码已由用户提交，提交号 `1ed174a`；本记录仅对应 Task 2。
